@@ -7,28 +7,30 @@ function toDict(title, priority, date, status) {
     }
     return task;
 }
-
-storedTasks = localStorage.getItem("tasks")
+let tasks = [];
+const storedTasks = localStorage.getItem("tasks")
 if (storedTasks)
     tasks = JSON.parse(storedTasks);
-else
-    tasks = []
 displayTasks();
 
 function addTask() {
-    let title = document.getElementById("task-title").value;
-    let priority = document.getElementById("task-priority").value;
-    let date = document.getElementById("task-date").value;
+    const title = document.getElementById("task-title").value;
+    const priority = document.getElementById("task-priority").value;
+    const date = document.getElementById("task-date").value;
     
     if (!title || !date) {
         alert("Please fill in all fields!");
         return;
     }
 
-    task = toDict(title, priority, date, false);
+    const task = toDict(title, priority, date, false);
     tasks.push(task);
     save();
     displayTasks();
+
+    document.getElementById("task-title").value = "";
+    document.getElementById("task-priority").value = "1";
+    document.getElementById("task-date").value = "";
 }
 
 function save() {
@@ -43,14 +45,14 @@ function displayTasks() {
         const newLi = document.createElement('li');
         const checkbox = document.createElement('input');
         const span = document.createElement('span');
-        const deleteButoon = document.createElement('button');
+        const deleteButton = document.createElement('button');
 
         checkbox.type = "checkbox";
         checkbox.setAttribute("data-index", index);
         checkbox.checked = element.status;
 
-        deleteButoon.innerHTML = "Delete";
-        deleteButoon.setAttribute("data-index", index);
+        deleteButton.innerHTML = "Delete";
+        deleteButton.setAttribute("data-index", index);
 
         span.innerHTML = ` ${element['title']} - <b>P${element['priority']}</b> due for ${element['date']}`;
         span.style.textDecoration = element.status ? "line-through" : "none";
@@ -66,16 +68,16 @@ function displayTasks() {
             save();
         })
 
-        deleteButoon.addEventListener("click", (e) => {
+        deleteButton.addEventListener("click", (e) => {
             const index = e.target.getAttribute("data-index");
             tasks.splice(index, 1);
-            displayTasks();
             save();
+            displayTasks();
         })
 
         newLi.appendChild(checkbox);
         newLi.appendChild(span);
-        newLi.appendChild(deleteButoon);
+        newLi.appendChild(deleteButton);
 
         ulElement.appendChild(newLi);
 
