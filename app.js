@@ -7,7 +7,14 @@ function toDict(title, priority, date, status) {
     }
     return task;
 }
-tasks = []
+
+storedTasks = localStorage.getItem("tasks")
+if (storedTasks)
+    tasks = JSON.parse(storedTasks);
+else
+    tasks = []
+displayTasks();
+
 function addTask() {
     let title = document.getElementById("task-title").value;
     let priority = document.getElementById("task-priority").value;
@@ -18,10 +25,14 @@ function addTask() {
         return;
     }
 
-    console.log(title, priority, date);
     task = toDict(title, priority, date, false);
     tasks.push(task);
+    save();
     displayTasks();
+}
+
+function save() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
 function displayTasks() {
@@ -52,12 +63,14 @@ function displayTasks() {
                 span.style.textDecoration = "line-through";
             else
                 span.style.textDecoration = "none";
+            save();
         })
 
         deleteButoon.addEventListener("click", (e) => {
             const index = e.target.getAttribute("data-index");
             tasks.splice(index, 1);
             displayTasks();
+            save();
         })
 
         newLi.appendChild(checkbox);
