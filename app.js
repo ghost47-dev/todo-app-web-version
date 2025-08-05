@@ -32,33 +32,40 @@ function displayTasks() {
         const newLi = document.createElement('li');
         const checkbox = document.createElement('input');
         const span = document.createElement('span');
+        const deleteButoon = document.createElement('button');
 
         checkbox.type = "checkbox";
         checkbox.setAttribute("data-index", index);
         checkbox.checked = element.status;
 
+        deleteButoon.innerHTML = "Delete";
+        deleteButoon.setAttribute("data-index", index);
+
         span.innerHTML = ` ${element['title']} - <b>P${element['priority']}</b> due for ${element['date']}`;
         span.style.textDecoration = element.status ? "line-through" : "none";
 
+        checkbox.addEventListener("change", (e) => {
+            const index = e.target.getAttribute("data-index");
+            tasks[index].status = e.target.checked;
+            const span = e.target.nextSibling;
+            if (e.target.checked) 
+                span.style.textDecoration = "line-through";
+            else
+                span.style.textDecoration = "none";
+        })
+
+        deleteButoon.addEventListener("click", (e) => {
+            const index = e.target.getAttribute("data-index");
+            tasks.splice(index, 1);
+            displayTasks();
+        })
+
         newLi.appendChild(checkbox);
         newLi.appendChild(span);
+        newLi.appendChild(deleteButoon);
 
         ulElement.appendChild(newLi);
 
-        document.querySelectorAll("ul li input").forEach(input => {
-            input.addEventListener("change", (e) => {
-                const index = e.target.getAttribute("data-index");
-                console.log(index);
-                tasks[index].status = e.target.checked;
-
-                const span = e.target.nextSibling;
-                if (e.target.checked) 
-                    span.style.textDecoration = "line-through";
-                else
-                    span.style.textDecoration = "none";
-                
-            })
-        })
     });
 }
 
