@@ -12,32 +12,65 @@ h1 {
 }
 
 .task-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    padding: 24px 32px;
     display: flex;
-    gap: 10px;
+    gap: 12px;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 32px;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .task-container input, .task-container select {
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #f5f6fa;
+    transition: border-color 0.2s;
+}
+
+.task-container input:focus, .task-container select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+#add-task-btn, #update-task-btn, #cancel-update-btn {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
 }
 
 #add-task-btn {
-    padding: 8px 16px;
-    background-color: #007bff;
-    border: none;
-    border-radius: 6px;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    background: linear-gradient(90deg, #007bff 60%, #00c6ff 100%);
+    color: #fff;
 }
 
 #add-task-btn:hover {
-    background-color: #0056b3;
+    background: linear-gradient(90deg, #0056b3 60%, #0096c7 100%);
+}
+
+#update-task-btn {
+    background: linear-gradient(90deg, #28a745 60%, #43e97b 100%);
+    color: #fff;
+}
+#update-task-btn:hover {
+    background: linear-gradient(90deg, #218838 60%, #38d39f 100%);
+}
+#cancel-update-btn {
+    background: #f5f6fa;
+    color: #333;
+    border: 1px solid #e0e0e0;
+}
+#cancel-update-btn:hover {
+    background: #e0e0e0;
 }
 
 ul#task-list {
@@ -48,31 +81,93 @@ ul#task-list {
 }
 
 ul#task-list li {
-    background-color: white;
-    padding: 12px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+    background-color: #fff;
+    padding: 16px;
+    margin-bottom: 14px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.04);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 10px;
+    transition: box-shadow 0.2s;
+}
+
+ul#task-list li:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
 
 ul#task-list li span {
     flex-grow: 1;
-    margin-left: 10px;
+    margin-left: 12px;
+    font-size: 16px;
+    color: #444;
 }
 
-ul#task-list li button {
+ul#task-list li b {
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+ul#task-list li span b:contains('P1') {background: #e3fcec; color: #28a745;}
+ul#task-list li span b:contains('P2') {background: #e3fcec; color: #ffc107;}
+ul#task-list li span b:contains('P3') {background: #e3fcec; color: #dc3545;}
+
+ul#task-list li button.delete-btn, ul#task-list li button.edit-btn {
+    font-size: 14px;
     background-color: #dc3545;
     color: white;
     border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
+    padding: 7px 14px;
+    border-radius: 7px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    margin-left: 6px;
+    transition: background 0.2s;
 }
 
-ul#task-list li button:hover {
+ul#task-list li button.delete-btn {
+    background: #dc3545;
+    color: #fff;
+}
+
+ul#task-list li button.delete-btn:hover {
     background-color: #a71d2a;
+}
+
+ul#task-list li button.edit-btn {
+    background: #007bff;
+    color: #fff;
+}
+
+ul#task-list li button.edit-btn:hover {
+    background: #0056b3;
+}
+
+#feedback-msg {
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 10px;
+    color: #28a745;
+    transition: opacity 0.3s;
+}
+
+#enter-hint {
+    color: #888;
+    font-size: 13px;
+    padding: 8px 16px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+@media (max-width: 600px) {
+    .task-container {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px;
+    }
+    ul#task-list li {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 12px;
+    }
 }
