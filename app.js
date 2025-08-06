@@ -1,194 +1,177 @@
-function toDict(title, priority, date, status) {
-    let task = {
-        "title": title,
-        "priority": priority,
-        "date": date,
-        "status": status
-    }
-    return task;
-}
-let updatedIndex = null;
-let tasks = [];
-const storedTasks = localStorage.getItem("tasks")
-if (storedTasks)
-    tasks = JSON.parse(storedTasks);
-displayTasks();
+(() => {
+    const taskTitleInput = document.getElementById("task-title");
+    const taskPriorityInput = document.getElementById("task-priority");
+    const taskDateInput = document.getElementById("task-date");
+    const addTaskBtn = document.getElementById("add-task-btn");
+    const updateTaskBtn = document.getElementById("update-task-btn");
+    const cancelUpdateBtn = document.getElementById("cancel-update-btn");
+    const enterHint = document.getElementById("enter-hint");
+    const feedbackMsg = document.getElementById("feedback-msg");
+    const taskList = document.getElementById("task-list");
 
-function checkForm() {
-    const title = document.getElementById("task-title").value.trim();
-    const priority = document.getElementById("task-priority").value;
-    const date = document.getElementById("task-date").value;
+    let tasks = [];
+    let updatedIndex = null;
+    let isFormFilled = false;
 
-    isFormFilled = title && priority && date;
-
-    const button = document.getElementById("add-task-btn");
-    const hint = document.getElementById("enter-hint");
-    button.disabled = !isFormFilled;
-
-    hint.style.opacity = isFormFilled ? "1" : "0";
-}
-
-function validateInput(title, date) {
-    if (!title || title.trim().length == 0) {
-        alert("Please enter a task's title!");
-        return false;
+    function createTaskObject(title, priority, date, status = false) {
+        return { title, priority, date, status };
     }
 
-    if (!date) {
-        alert("Please enter a date!");
-        return false;
+    function loadTasks() {
+        try {
+            const stored = localStorage.getItem("tasks");
+            tasks = stored ? JSON.parse(stored) : [];
+        } catch (e) {
+            tasks = [];
+        }
     }
 
-    return true;
-}
+    function saveTasks() {
+        try {
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        } catch (e) {
+            showFeedback("Error saving tasks!");
+        }
+    }
 
-function resetForm() {
-    document.getElementById("task-title").value = "";
-    document.getElementById("task-priority").value = "1";
-    document.getElementById("task-date").value = "";
-}
+    function validateInput(title, date) {
+        if (!title.trim()) {
+            alert("Please enter a task's title!");
+            return false;
+        }
+        if (!date) {
+            alert("Please enter a date!");
+            return false;
+        }
+        return true;
+    }
 
-function addTask() {
-    const title = document.getElementById("task-title").value;
-    const priority = document.getElementById("task-priority").value;
-    const date = document.getElementById("task-date").value;
-    
-    if (!validateInput(title, date)) return;
+    function resetForm() {
+        taskTitleInput.value = "";
+        taskPriorityInput.value = "1";
+        taskDateInput.value = "";
+        checkForm();
+    }
 
-    const task = toDict(title, priority, date, false);
-    tasks.push(task);
-    save();
-    displayTasks();
+    function checkForm() {
+        isFormFilled = taskTitleInput.value.trim() && taskPriorityInput.value && taskDateInput.value;
+        addTaskBtn.disabled = !isFormFilled;
+        enterHint.style.opacity = isFormFilled ? "1" : "0";
+    }
 
-    resetForm();
-    document.getElementById("enter-hint").style.opacity = "0";
+    function showFeedback(msg) {
+        feedbackMsg.innerHTML = msg;
+        setTimeout(() => { feedbackMsg.innerHTML = ""; }, 1500);
+    }
 
-    document.getElementById("task-title").focus();
+    function renderTasks() {
+        taskList.innerHTML = "";
+        tasks.forEach((task, index) => {
+            const li = document.createElement('li');
+            const checkbox = document.createElement('input');
+            checkbox.type = "checkbox";
+            checkbox.checked = task.status;
+            checkbox.dataset.index = index;
 
-}
+            const span = document.createElement('span');
+            span.innerHTML = ` ${task.title} - <b>P${task.priority}</b> due for ${task.date}`;
+            span.style.textDecoration = task.status ? "line-through" : "none";
+            span.style.opacity = task.status ? "0.6" : "1";
 
-function save() {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-}
+            const editBtn = document.createElement('button');
+            editBtn.textContent = "Edit";
+            editBtn.className = "edit-btn";
+            editBtn.dataset.index = index;
 
-function displayTasks() {
-    const ulElement = document.getElementById("task-list");
-    ulElement.innerHTML = "";
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = "Delete";
+            deleteBtn.className = "delete-btn";
+            deleteBtn.dataset.index = index;
 
-    tasks.forEach((element, index) => {
-        const newLi = document.createElement('li');
-        const checkbox = document.createElement('input');
-        const span = document.createElement('span');
-        const deleteButton = document.createElement('button');
-        const editButton = document.createElement('button');
+            li.append(checkbox, span, editBtn, deleteBtn);
+            taskList.appendChild(li);
+        });
+    }
 
-        checkbox.type = "checkbox";
-        checkbox.setAttribute("data-index", index);
-        checkbox.checked = element.status;
+    function addTask() {
+        const title = taskTitleInput.value;
+        const priority = taskPriorityInput.value;
+        const date = taskDateInput.value;
+        if (!validateInput(title, date)) return;
+        tasks.push(createTaskObject(title, priority, date));
+        saveTasks();
+        renderTasks();
+        resetForm();
+        enterHint.style.opacity = "0";
+        taskTitleInput.focus();
+    }
 
-        deleteButton.innerHTML = "Delete";
-        deleteButton.setAttribute("data-index", index);
-        deleteButton.setAttribute("class", "delete-btn");
+    function updateTask() {
+        const title = taskTitleInput.value;
+        const date = taskDateInput.value;
+        const priority = taskPriorityInput.value;
+        if (!validateInput(title, date)) return;
+        Object.assign(tasks[updatedIndex], { title, date, priority });
+        saveTasks();
+        renderTasks();
+        resetForm();
+        toggleUpdateMode(false);
+        showFeedback("Task updated!");
+    }
 
-        editButton.innerHTML = "Edit";
-        editButton.setAttribute("data-index", index);
-        editButton.setAttribute("class", "edit-btn");
+    function cancelUpdate() {
+        resetForm();
+        toggleUpdateMode(false);
+        taskTitleInput.focus();
+    }
 
-        span.innerHTML = ` ${element['title']} - <b>P${element['priority']}</b> due for ${element['date']}`;
-        span.style.textDecoration = element.status ? "line-through" : "none";
-        span.style.opacity = element.status ? "0.6" : "1";
+    function toggleUpdateMode(isUpdating) {
+        updateTaskBtn.style.display = isUpdating ? "inline-block" : "none";
+        cancelUpdateBtn.style.display = isUpdating ? "inline-block" : "none";
+        addTaskBtn.style.display = isUpdating ? "none" : "inline-block";
+    }
 
-        checkbox.addEventListener("change", (e) => {
-            const index = e.target.getAttribute("data-index");
-            tasks[index].status = e.target.checked;
-            const span = e.target.nextSibling;
-            span.style.textDecoration = e.target.checked ? "line-through" : "none";
-            span.style.opacity = e.target.checked ? "0.6" : "1";
-            save();
-        })
+    // Event Listeners
+    addTaskBtn.addEventListener("click", addTask);
+    updateTaskBtn.addEventListener("click", updateTask);
+    cancelUpdateBtn.addEventListener("click", cancelUpdate);
+    taskTitleInput.addEventListener("input", checkForm);
+    taskDateInput.addEventListener("change", checkForm);
 
-        deleteButton.addEventListener("click", (e) => {
-            const index = e.target.getAttribute("data-index");
-            tasks.splice(index, 1);
-            save();
-            displayTasks();
-        })
-
-        editButton.addEventListener("click", (e) => {
-            const index = e.target.getAttribute("data-index");
-            const title = tasks[index].title;
-            const date = tasks[index].date;
-            const priority = tasks[index].priority;
-
-            document.getElementById("task-title").value = title;
-            document.getElementById("task-date").value = date;
-            document.getElementById("task-priority").value = priority;
-
-            document.getElementById("update-task-btn").style.display = "inline-block";
-            document.getElementById("cancel-update-btn").style.display = "inline-block";
-            document.getElementById("add-task-btn").style.display = "none";
-
-            updatedIndex = index;
-            
-
-        })
-
-        newLi.appendChild(checkbox);
-        newLi.appendChild(span);
-        newLi.appendChild(editButton);
-        newLi.appendChild(deleteButton);
-
-
-        ulElement.appendChild(newLi);
-
+    document.addEventListener("keydown", (e) => {
+        if (e.key === 'Enter' && isFormFilled && addTaskBtn.style.display !== "none") {
+            addTask();
+        }
     });
-}
 
-function cancelUpdate() {
-    document.getElementById("update-task-btn").style.display = "none";
-    document.getElementById("cancel-update-btn").style.display = "none";
-    document.getElementById("add-task-btn").style.display = "inline-block";
-    document.getElementById("task-title").focus();
-    resetForm();
-}
+    taskList.addEventListener("click", (e) => {
+        const index = e.target.dataset.index;
+        if (e.target.classList.contains("delete-btn")) {
+            tasks.splice(index, 1);
+            saveTasks();
+            renderTasks();
+        } else if (e.target.classList.contains("edit-btn")) {
+            const task = tasks[index];
+            taskTitleInput.value = task.title;
+            taskDateInput.value = task.date;
+            taskPriorityInput.value = task.priority;
+            updatedIndex = index;
+            toggleUpdateMode(true);
+            taskTitleInput.focus();
+        }
+    });
 
-function showFeedback(msg) {
-    const el = document.getElementById("feedback-msg");
-    el.innerHTML = msg;
-    setTimeout(() => {el.innerHTML = "";}, 1500);
-}
+    taskList.addEventListener("change", (e) => {
+        if (e.target.type === "checkbox") {
+            const index = e.target.dataset.index;
+            tasks[index].status = e.target.checked;
+            saveTasks();
+            renderTasks();
+        }
+    });
 
-function updateTask() {
-    const title = document.getElementById("task-title").value;
-    const date = document.getElementById("task-date").value;
-    const priority = document.getElementById("task-priority").value;
-
-    if (!validateInput(title, date)) return;
-
-    tasks[updatedIndex].title = title;
-    tasks[updatedIndex].date = date;
-    tasks[updatedIndex].priority = priority;
-
-    document.getElementById("update-task-btn").style.display = "none";
-    document.getElementById("cancel-update-btn").style.display = "none";
-    document.getElementById("add-task-btn").style.display = "inline-block";
-    document.getElementById("task-title").focus();
-
-    resetForm();
-    save();
-    displayTasks();
-    showFeedback("Task updated!")
-}
-
-document.getElementById("add-task-btn").addEventListener("click", addTask);
-document.getElementById("task-title").addEventListener("input", checkForm)
-document.getElementById("task-date").addEventListener("change", checkForm)
-
-document.addEventListener("keydown", (e) => {
-    if (e.key == 'Enter' && isFormFilled) {
-        addTask();
-    }
-})
-
-document.getElementById("update-task-btn").addEventListener("click", updateTask);
-document.getElementById("cancel-update-btn").addEventListener("click", cancelUpdate);
+    // Initialize
+    loadTasks();
+    renderTasks();
+    checkForm();
+})();
