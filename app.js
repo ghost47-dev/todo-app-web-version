@@ -8,10 +8,15 @@
     const enterHint = document.getElementById("enter-hint");
     const feedbackMsg = document.getElementById("feedback-msg");
     const taskList = document.getElementById("task-list");
+    const taskSortInput = document.getElementById("sort-task");
+    const ascSortInput = document.getElementById("asc-sort");
+    const descSortInput = document.getElementById("desc-sort");
 
     let tasks = [];
     let updatedIndex = null;
     let isFormFilled = false;
+    const SORT_PRIORITY = "1";
+    const SORT_DATE = "2";
 
     function createTaskObject(title, priority, date, status = false) {
         return { title, priority, date, status };
@@ -55,7 +60,6 @@
 
     function checkForm() {
         isFormFilled = taskTitleInput.value.trim() && taskPriorityInput.value && taskDateInput.value;
-        addTaskBtn.disabled = !isFormFilled;
         enterHint.style.opacity = isFormFilled ? "1" : "0";
     }
 
@@ -100,7 +104,10 @@
         if (!validateInput(title, date)) return;
         tasks.push(createTaskObject(title, priority, date));
         saveTasks();
-        renderTasks();
+        if (sortMode()) 
+            sortTask();
+        else
+            renderTasks();
         resetForm();
         enterHint.style.opacity = "0";
         taskTitleInput.focus();
@@ -131,12 +138,32 @@
         addTaskBtn.style.display = isUpdating ? "none" : "inline-block";
     }
 
+    function sortMode() {
+        const key = taskSortInput.value;
+        return key != 0;
+    }
+
+    function sortTask() {
+        const key = taskSortInput.value;
+        const direction = ascSortInput.checked ? 1 : -1;
+        if (key === SORT_PRIORITY)
+            tasks.sort((a, b) => (a.priority - b.priority) * direction);
+        else if (key == SORT_DATE)
+            tasks.sort((a, b) => (new Date(a.date) - new Date(b.date)) * direction);
+        else 
+            return;
+        renderTasks();
+    }
+
     // Event Listeners
     addTaskBtn.addEventListener("click", addTask);
     updateTaskBtn.addEventListener("click", updateTask);
     cancelUpdateBtn.addEventListener("click", cancelUpdate);
     taskTitleInput.addEventListener("input", checkForm);
     taskDateInput.addEventListener("change", checkForm);
+    taskSortInput.addEventListener("change", sortTask);
+    ascSortInput.addEventListener("change", sortTask);
+    descSortInput.addEventListener("change", sortTask);
 
     document.addEventListener("keydown", (e) => {
         if (e.key === 'Enter' && isFormFilled && addTaskBtn.style.display !== "none") {

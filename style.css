@@ -33,6 +33,49 @@ h1 {
     transition: border-color 0.2s;
 }
 
+#sort-task {
+    min-width: 120px;
+    font-weight: 500;
+    background: #eaf6ff;
+    border: 1.5px solid #b6e0fe;
+    color: #000;
+    margin-left: 8px;
+}
+
+.sort-order-group {
+    display: flex;
+    align-items: center;    
+    gap: 8px;
+    margin-left: 8px;
+}
+
+.sort-radio {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #b6e0fe;
+    border-radius: 50%;
+    background: #fff;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.2s;
+}
+.sort-radio:checked {
+    border-color: #007bff;
+    background: #eaf6ff;
+}
+.sort-radio:focus {
+    box-shadow: 0 0 0 2px #b6e0fe;
+}
+.sort-label {
+    font-size: 15px;
+    color: #007bff;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+}
+
 .task-container input:focus, .task-container select:focus {
     border-color: #007bff;
     outline: none;
@@ -157,6 +200,18 @@ ul#task-list li button.edit-btn:hover {
     padding: 8px 16px;
     opacity: 0;
     transition: opacity 0.3s;
+}
+
+@media (max-width: 900px) {
+    .task-container {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px;
+    }
+    .sort-order-group {
+        margin-left: 0;
+        margin-top: 8px;
+    }
 }
 
 @media (max-width: 600px) {

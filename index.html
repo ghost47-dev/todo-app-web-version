@@ -13,14 +13,26 @@
             <input type="text" id="task-title" placeholder="Task name">
             <input type="date" id="task-date">
             <select id="task-priority">
-                <option value="1">Low</option>
+                <option value="3">Low</option>
                 <option value="2">Medium</option>
-                <option value="3">High</option>
+                <option value="1">High</option>
             </select>
             <button id="add-task-btn">Add Task</button>
             <button id="update-task-btn" style="display: none;">Update Task</button>
             <button id="cancel-update-btn" style="display: none;">Cancel</button>
             <div id="enter-hint">Press Enter to add task</div>
+            <select id="sort-task">
+                <option value="0">Sort by: </option>
+                <option value="1">Priority</option>
+                <option value="2">Due date</option>
+            </select>
+            <div class="sort-order-group">
+                <input type="radio" name="sort-order" class="radio-input" id="asc-sort" checked>
+                <label for="asc-sort" class="sort-label">Ascending</label>
+                <input type="radio" name="sort-order" class = "radio-input" id="desc-sort">
+                <label for="desc-sort" class="sort-label">Descending</label>
+
+            </div>
             <div id="feedback-msg" style="color: green; font-size: 13px; margin-left: 10px;"></div>
         </div>
         <ul id="task-list"></ul>
