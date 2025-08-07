@@ -33,9 +33,5 @@ style.css - styling (optional)
 ## 📌 Future Improvements
 Edit task category or add filtering
 
-Sort by priority or date
-
-Responsive design
-
 ## 👨‍💻 Author
 Made by ghost47-dev
